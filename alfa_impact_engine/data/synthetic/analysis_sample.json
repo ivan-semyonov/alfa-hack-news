@@ -1,0 +1,316 @@
+{
+  "schema_version": "0.3.0",
+  "normalization": {
+    "schema_version": "0.3.0",
+    "mode": "RULES_DEMO",
+    "status": "NEEDS_REVIEW",
+    "content_hash": "7978818b358ea61186081a1aac3eac1f157f063234ecd2adeb1c0d18b5a46ce0",
+    "source": {
+      "id": "news:53bffddacfb7398e929f",
+      "title": "Учебное событие: объявлено ограничение поставок компонента X. Это вымышленная новость для проверки возможного канала воздействия. Какие компании действительно и",
+      "text": "Учебное событие: объявлено ограничение поставок компонента X.\nЭто вымышленная новость для проверки возможного канала воздействия.\nКакие компании действительно используют компонент и каковы их запасы, не установлено.\n",
+      "source_url": null,
+      "is_synthetic": true
+    },
+    "event": {
+      "id": "event:53bffddacfb7398e929f",
+      "title": "Учебное событие: объявлено ограничение поставок компонента X. Это вымышленная новость для проверки возможного канала воздействия. Какие компании действительно и",
+      "summary": "Извлечены утверждения источника; истинность и смысл события требуют проверки.",
+      "target_node_ids": [
+        "RESOURCE_X"
+      ],
+      "channels": [
+        "SUPPLY"
+      ],
+      "source_ids": [
+        "news:53bffddacfb7398e929f"
+      ],
+      "is_synthetic": true
+    },
+    "extraction": {
+      "assertions": [
+        {
+          "id": "assertion:1",
+          "text": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 0,
+            "end": 61,
+            "quote": "Учебное событие: объявлено ограничение поставок компонента X."
+          },
+          "actor": null,
+          "action": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 27,
+            "end": 38,
+            "quote": "ограничение"
+          },
+          "object": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 48,
+            "end": 60,
+            "quote": "компонента X"
+          },
+          "modality": "ASSERTED",
+          "verification_status": "SOURCE_ASSERTION"
+        },
+        {
+          "id": "assertion:2",
+          "text": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 62,
+            "end": 129,
+            "quote": "Это вымышленная новость для проверки возможного канала воздействия."
+          },
+          "actor": null,
+          "action": null,
+          "object": null,
+          "modality": "ASSERTED",
+          "verification_status": "SOURCE_ASSERTION"
+        },
+        {
+          "id": "assertion:3",
+          "text": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 130,
+            "end": 215,
+            "quote": "Какие компании действительно используют компонент и каковы их запасы, не установлено."
+          },
+          "actor": null,
+          "action": null,
+          "object": null,
+          "modality": "NEGATED",
+          "verification_status": "SOURCE_ASSERTION"
+        }
+      ],
+      "dates": [],
+      "quantities": [],
+      "target_mentions": [
+        {
+          "node_id": "RESOURCE_X",
+          "span": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 48,
+            "end": 60,
+            "quote": "компонента X"
+          },
+          "assertion_id": "assertion:1"
+        }
+      ],
+      "channels": [
+        "SUPPLY"
+      ],
+      "channel_evidence": [
+        {
+          "channel": "SUPPLY",
+          "span": {
+            "source_id": "news:53bffddacfb7398e929f",
+            "start": 39,
+            "end": 47,
+            "quote": "поставок"
+          }
+        }
+      ],
+      "knowledge_gaps": [
+        "Утверждения источника не проверены независимыми доказательствами.",
+        "Актор, действие и объект извлекаются только при явных словарных совпадениях; полнота не гарантирована."
+      ],
+      "schema_version": "0.3.0",
+      "mode": "RULES",
+      "review_status": "NEEDS_REVIEW",
+      "source_id": "news:53bffddacfb7398e929f",
+      "content_hash": "7978818b358ea61186081a1aac3eac1f157f063234ecd2adeb1c0d18b5a46ce0",
+      "warnings": [
+        "Локальное извлечение по правилам: проверяется буквальное происхождение полей, смысл требует проверки.",
+        "Распознавание отрицаний и условий ограничено простыми шаблонами и может ошибаться."
+      ],
+      "provider_metadata": null
+    },
+    "target_matches": [
+      {
+        "quote": "компонента X",
+        "start": 48,
+        "end": 60,
+        "node_id": "RESOURCE_X",
+        "label": "Условный компонент X"
+      }
+    ],
+    "channel_matches": [
+      {
+        "quote": "поставок",
+        "start": 39,
+        "end": 47,
+        "channel": "SUPPLY"
+      }
+    ],
+    "warnings": [
+      "Локальное извлечение по правилам: проверяется буквальное происхождение полей, смысл требует проверки.",
+      "Распознавание отрицаний и условий ограничено простыми шаблонами и может ошибаться.",
+      "Полнота, достоверность, актуальность и направление эффекта требуют ручной проверки.",
+      "Сопоставление с графом ограничено учебным компонентом X; прочие объекты не исследованы."
+    ]
+  },
+  "analysis": {
+    "schema_version": "0.3.0",
+    "company": {
+      "id": "DEMO-MFG",
+      "name": "Демо: завод электродвигателей",
+      "industry_code": "27.11",
+      "industry_label": "Производство электродвигателей (пример)",
+      "region": "Учебный регион",
+      "bank_loan_mark": true,
+      "is_synthetic": true
+    },
+    "event": {
+      "id": "event:53bffddacfb7398e929f",
+      "title": "Учебное событие: объявлено ограничение поставок компонента X. Это вымышленная новость для проверки возможного канала воздействия. Какие компании действительно и",
+      "summary": "Извлечены утверждения источника; истинность и смысл события требуют проверки.",
+      "target_node_ids": [
+        "RESOURCE_X"
+      ],
+      "channels": [
+        "SUPPLY"
+      ],
+      "source_ids": [
+        "news:53bffddacfb7398e929f"
+      ],
+      "is_synthetic": true
+    },
+    "paths": [
+      {
+        "id": "9f7b6d6f09c9ac4c",
+        "company_id": "DEMO-MFG",
+        "event_id": "event:53bffddacfb7398e929f",
+        "node_ids": [
+          "RESOURCE_X",
+          "MFG_PROC",
+          "MFG_PRODUCT",
+          "MFG_KPI"
+        ],
+        "edge_ids": [
+          "e_requires_x",
+          "e_product_process",
+          "e_kpi_product"
+        ],
+        "edge_statuses": [
+          "TEMPLATE",
+          "TEMPLATE",
+          "INFERENCE"
+        ],
+        "evidence_ids": [
+          "ev_template_01"
+        ],
+        "path_status": "HYPOTHETICAL",
+        "impact_level": "UNKNOWN",
+        "disclaimer": "Маршрут выявляет потенциальный канал, но не доказывает причинный эффект."
+      }
+    ],
+    "outcome": "POTENTIAL_EXPOSURE",
+    "facts_known": [
+      "Использована синтетическая модель компании; текст получен как непроверенный источник."
+    ],
+    "knowledge_gaps": [
+      "Смысл, достоверность, дата и направление изменения из текста не проверены.",
+      "Применимость отраслевого шаблона к фактическим процессам компании не подтверждена.",
+      "Объёмы запасов, условия договоров и заменители компонента неизвестны.",
+      "Материалы аналитиков Альфа-Банка не загружены.",
+      "Утверждения источника не проверены независимыми доказательствами.",
+      "Актор, действие и объект извлекаются только при явных словарных совпадениях; полнота не гарантирована."
+    ],
+    "warning": "Учебный граф; извлечение RULES. Инсайт составлен по шаблону; маршрут условный."
+  },
+  "insight": {
+    "schema_version": "0.2.0",
+    "id": "insight:DEMO-MFG:53bffddacfb7398e929f",
+    "company_id": "DEMO-MFG",
+    "event_id": "event:53bffddacfb7398e929f",
+    "mode": "RULES_DEMO",
+    "status": "POTENTIAL_EXPOSURE",
+    "what_happened": "Из текста выделены непроверенные утверждения источника. Заголовок: Учебное событие: объявлено ограничение поставок компонента X. Это вымышленная новость для проверки возможного канала воздействия. Какие компании действительно и",
+    "why_for_company": "В учебном шаблоне компании есть условная зависимость от компонента X; в одном фрагменте источника найдены признаки возможного изменения поставок.",
+    "risk_items": [
+      {
+        "statement": "Если изменение поставок действительно затрагивает используемый компанией компонент, следует проверить возможное влияние на сборку, продукцию и выпуск. Наличие зависимости и знак эффекта пока не подтверждены.",
+        "knowledge_status": "HYPOTHESIS",
+        "path_ids": [
+          "9f7b6d6f09c9ac4c"
+        ],
+        "source_ids": [
+          "ev_template_01",
+          "news:53bffddacfb7398e929f"
+        ]
+      }
+    ],
+    "opportunity_items": [],
+    "impact_paths": [
+      {
+        "id": "9f7b6d6f09c9ac4c",
+        "company_id": "DEMO-MFG",
+        "event_id": "event:53bffddacfb7398e929f",
+        "node_ids": [
+          "RESOURCE_X",
+          "MFG_PROC",
+          "MFG_PRODUCT",
+          "MFG_KPI"
+        ],
+        "edge_ids": [
+          "e_requires_x",
+          "e_product_process",
+          "e_kpi_product"
+        ],
+        "edge_statuses": [
+          "TEMPLATE",
+          "TEMPLATE",
+          "INFERENCE"
+        ],
+        "evidence_ids": [
+          "ev_template_01"
+        ],
+        "path_status": "HYPOTHETICAL",
+        "impact_level": "UNKNOWN",
+        "disclaimer": "Маршрут выявляет потенциальный канал, но не доказывает причинный эффект."
+      }
+    ],
+    "alfa_view": {
+      "status": "NOT_FOUND",
+      "statement": "Аналитика Альфа-Банка не подключена; позиция банка не установлена.",
+      "quote_ref": null
+    },
+    "actions": [
+      {
+        "text": "Проверить исходную публикацию, дату и смысл описанного изменения.",
+        "path_id": null,
+        "data_gap": "Смысл, достоверность, дата и направление изменения из текста не проверены."
+      },
+      {
+        "text": "Уточнить у ответственного за закупки, используется ли компонент X и затрагивает ли событие действующие поставки.",
+        "path_id": "9f7b6d6f09c9ac4c",
+        "data_gap": null
+      }
+    ],
+    "knowledge_gaps": [
+      "Смысл, достоверность, дата и направление изменения из текста не проверены.",
+      "Применимость отраслевого шаблона к фактическим процессам компании не подтверждена.",
+      "Объёмы запасов, условия договоров и заменители компонента неизвестны.",
+      "Материалы аналитиков Альфа-Банка не загружены.",
+      "Утверждения источника не проверены независимыми доказательствами.",
+      "Актор, действие и объект извлекаются только при явных словарных совпадениях; полнота не гарантирована."
+    ],
+    "sources": [
+      {
+        "id": "ev_template_01",
+        "source_kind": "INDUSTRY_TEMPLATE",
+        "source_reference": "synthetic:manufacturing-v0",
+        "statement": "Типовой учебный процесс может использовать компонент X.",
+        "is_synthetic": true
+      },
+      {
+        "id": "news:53bffddacfb7398e929f",
+        "source_kind": "NEWS",
+        "source_reference": "input:news:53bffddacfb7398e929f",
+        "statement": "Непроверенный текст новости, переданный пользователем.",
+        "is_synthetic": true
+      }
+    ],
+    "agent_run_id": null
+  }
+}

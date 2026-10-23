@@ -1,0 +1,345 @@
+{
+  "$defs": {
+    "AlfaView": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "SUPPORTS",
+            "REFINES",
+            "CONTRADICTS",
+            "NOT_FOUND"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "statement": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "quote_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote Ref"
+        }
+      },
+      "required": [
+        "status",
+        "statement"
+      ],
+      "title": "AlfaView",
+      "type": "object"
+    },
+    "InsightItem": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "knowledge_status": {
+          "default": "HYPOTHESIS",
+          "enum": [
+            "HYPOTHESIS",
+            "UNVERIFIED"
+          ],
+          "title": "Knowledge Status",
+          "type": "string"
+        },
+        "path_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement"
+      ],
+      "title": "InsightItem",
+      "type": "object"
+    },
+    "KnowledgeStatus": {
+      "enum": [
+        "FACT",
+        "TEMPLATE",
+        "INFERENCE",
+        "HYPOTHESIS",
+        "REJECTED"
+      ],
+      "title": "KnowledgeStatus",
+      "type": "string"
+    },
+    "StrictEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "source_reference": {
+          "title": "Source Reference",
+          "type": "string"
+        },
+        "statement": {
+          "title": "Statement",
+          "type": "string"
+        },
+        "is_synthetic": {
+          "default": true,
+          "title": "Is Synthetic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "source_kind",
+        "source_reference",
+        "statement"
+      ],
+      "title": "StrictEvidence",
+      "type": "object"
+    },
+    "StrictPath": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "company_id": {
+          "title": "Company Id",
+          "type": "string"
+        },
+        "event_id": {
+          "title": "Event Id",
+          "type": "string"
+        },
+        "node_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "edge_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Edge Ids",
+          "type": "array"
+        },
+        "edge_statuses": {
+          "items": {
+            "$ref": "#/$defs/KnowledgeStatus"
+          },
+          "title": "Edge Statuses",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "path_status": {
+          "title": "Path Status",
+          "type": "string"
+        },
+        "impact_level": {
+          "default": "UNKNOWN",
+          "title": "Impact Level",
+          "type": "string"
+        },
+        "disclaimer": {
+          "default": "Маршрут выявляет потенциальный канал, но не доказывает причинный эффект.",
+          "title": "Disclaimer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "company_id",
+        "event_id",
+        "node_ids",
+        "edge_ids",
+        "edge_statuses",
+        "evidence_ids",
+        "path_status"
+      ],
+      "title": "StrictPath",
+      "type": "object"
+    },
+    "SuggestedAction": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "path_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Path Id"
+        },
+        "data_gap": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Gap"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "SuggestedAction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0",
+      "default": "0.2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "company_id": {
+      "title": "Company Id",
+      "type": "string"
+    },
+    "event_id": {
+      "title": "Event Id",
+      "type": "string"
+    },
+    "mode": {
+      "const": "RULES_DEMO",
+      "default": "RULES_DEMO",
+      "title": "Mode",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "POTENTIAL_EXPOSURE",
+        "NEEDS_MORE_DATA"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "what_happened": {
+      "title": "What Happened",
+      "type": "string"
+    },
+    "why_for_company": {
+      "title": "Why For Company",
+      "type": "string"
+    },
+    "risk_items": {
+      "items": {
+        "$ref": "#/$defs/InsightItem"
+      },
+      "title": "Risk Items",
+      "type": "array"
+    },
+    "opportunity_items": {
+      "items": {
+        "$ref": "#/$defs/InsightItem"
+      },
+      "title": "Opportunity Items",
+      "type": "array"
+    },
+    "impact_paths": {
+      "items": {
+        "$ref": "#/$defs/StrictPath"
+      },
+      "title": "Impact Paths",
+      "type": "array"
+    },
+    "alfa_view": {
+      "$ref": "#/$defs/AlfaView"
+    },
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/SuggestedAction"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "knowledge_gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Knowledge Gaps",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/StrictEvidence"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "agent_run_id": {
+      "default": null,
+      "title": "Agent Run Id",
+      "type": "null"
+    }
+  },
+  "required": [
+    "id",
+    "company_id",
+    "event_id",
+    "status",
+    "what_happened",
+    "why_for_company",
+    "alfa_view",
+    "actions",
+    "knowledge_gaps",
+    "sources"
+  ],
+  "title": "StrictInsight",
+  "type": "object"
+}

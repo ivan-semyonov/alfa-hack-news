@@ -1,0 +1,315 @@
+{
+  "$defs": {
+    "ChannelEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/ImpactChannel"
+        },
+        "span": {
+          "$ref": "#/$defs/SourceSpan"
+        }
+      },
+      "required": [
+        "channel",
+        "span"
+      ],
+      "title": "ChannelEvidence",
+      "type": "object"
+    },
+    "DateMention": {
+      "additionalProperties": false,
+      "properties": {
+        "span": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "iso_date": {
+          "anyOf": [
+            {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Iso Date"
+        },
+        "role": {
+          "enum": [
+            "EVENT",
+            "PUBLICATION",
+            "UNSPECIFIED"
+          ],
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "span",
+        "iso_date",
+        "role"
+      ],
+      "title": "DateMention",
+      "type": "object"
+    },
+    "ImpactChannel": {
+      "enum": [
+        "SUPPLY",
+        "DEMAND",
+        "FINANCE",
+        "REGULATION",
+        "TECHNOLOGY",
+        "LABOR",
+        "INFRASTRUCTURE",
+        "COMPETITION",
+        "GEOGRAPHY",
+        "MACRO",
+        "OTHER"
+      ],
+      "title": "ImpactChannel",
+      "type": "string"
+    },
+    "QuantityMention": {
+      "additionalProperties": false,
+      "properties": {
+        "span": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "value": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "span",
+        "value",
+        "unit",
+        "period"
+      ],
+      "title": "QuantityMention",
+      "type": "object"
+    },
+    "SourceAssertion": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "object": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SourceSpan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "modality": {
+          "enum": [
+            "ASSERTED",
+            "NEGATED",
+            "POSSIBLE",
+            "UNKNOWN"
+          ],
+          "title": "Modality",
+          "type": "string"
+        },
+        "verification_status": {
+          "const": "SOURCE_ASSERTION",
+          "title": "Verification Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "actor",
+        "action",
+        "object",
+        "modality",
+        "verification_status"
+      ],
+      "title": "SourceAssertion",
+      "type": "object"
+    },
+    "SourceSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "start",
+        "end",
+        "quote"
+      ],
+      "title": "SourceSpan",
+      "type": "object"
+    },
+    "TargetMention": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "span": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "assertion_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Assertion Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "span",
+        "assertion_id"
+      ],
+      "title": "TargetMention",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assertions": {
+      "items": {
+        "$ref": "#/$defs/SourceAssertion"
+      },
+      "maxItems": 12,
+      "title": "Assertions",
+      "type": "array"
+    },
+    "dates": {
+      "items": {
+        "$ref": "#/$defs/DateMention"
+      },
+      "maxItems": 20,
+      "title": "Dates",
+      "type": "array"
+    },
+    "quantities": {
+      "items": {
+        "$ref": "#/$defs/QuantityMention"
+      },
+      "maxItems": 20,
+      "title": "Quantities",
+      "type": "array"
+    },
+    "target_mentions": {
+      "items": {
+        "$ref": "#/$defs/TargetMention"
+      },
+      "maxItems": 20,
+      "title": "Target Mentions",
+      "type": "array"
+    },
+    "channels": {
+      "items": {
+        "$ref": "#/$defs/ImpactChannel"
+      },
+      "maxItems": 11,
+      "minItems": 1,
+      "title": "Channels",
+      "type": "array"
+    },
+    "channel_evidence": {
+      "items": {
+        "$ref": "#/$defs/ChannelEvidence"
+      },
+      "maxItems": 22,
+      "title": "Channel Evidence",
+      "type": "array"
+    },
+    "knowledge_gaps": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Knowledge Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "assertions",
+    "dates",
+    "quantities",
+    "target_mentions",
+    "channels",
+    "channel_evidence",
+    "knowledge_gaps"
+  ],
+  "title": "ExtractionDraft",
+  "type": "object"
+}

@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "HypothesisProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "channel": {
+          "$ref": "#/$defs/ImpactChannel"
+        },
+        "statement": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "knowledge_status": {
+          "const": "HYPOTHESIS",
+          "default": "HYPOTHESIS",
+          "title": "Knowledge Status",
+          "type": "string"
+        },
+        "verification_status": {
+          "const": "UNVERIFIED",
+          "default": "UNVERIFIED",
+          "title": "Verification Status",
+          "type": "string"
+        },
+        "target_node_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Target Node Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "evidence_needed": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Evidence Needed",
+          "type": "array"
+        },
+        "missing_data": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Missing Data",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "channel",
+        "statement",
+        "evidence_needed"
+      ],
+      "title": "HypothesisProposal",
+      "type": "object"
+    },
+    "ImpactChannel": {
+      "enum": [
+        "SUPPLY",
+        "DEMAND",
+        "FINANCE",
+        "REGULATION",
+        "TECHNOLOGY",
+        "LABOR",
+        "INFRASTRUCTURE",
+        "COMPETITION",
+        "GEOGRAPHY",
+        "MACRO",
+        "OTHER"
+      ],
+      "title": "ImpactChannel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0",
+      "default": "0.2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company_id": {
+      "minLength": 1,
+      "title": "Company Id",
+      "type": "string"
+    },
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "hypotheses": {
+      "items": {
+        "$ref": "#/$defs/HypothesisProposal"
+      },
+      "maxItems": 6,
+      "title": "Hypotheses",
+      "type": "array"
+    },
+    "knowledge_gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Knowledge Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "company_id",
+    "event_id"
+  ],
+  "title": "HypothesisSet",
+  "type": "object"
+}

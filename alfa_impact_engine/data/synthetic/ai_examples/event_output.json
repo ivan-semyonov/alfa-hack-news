@@ -1,0 +1,9 @@
+{
+  "id": "event:manual-demo",
+  "title": "Учебное ограничение поставок компонента X",
+  "summary": "Источник описывает вымышленное ограничение поставок; воздействие на компанию не установлено.",
+  "target_node_ids": ["RESOURCE_X"],
+  "channels": ["SUPPLY"],
+  "source_ids": ["source:manual-demo"],
+  "is_synthetic": true
+}

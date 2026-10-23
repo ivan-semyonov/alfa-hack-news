@@ -1,0 +1,11 @@
+{
+  "company_id": "DEMO-MFG",
+  "event_id": "event:manual-demo",
+  "source_ids": ["source:manual-demo"],
+  "target_node_ids": ["RESOURCE_X"],
+  "is_synthetic": true,
+  "news": {
+    "title": "Учебное ограничение поставок",
+    "text": "В вымышленном сценарии поставки компонента X ограничены. Применимость к компании требует проверки."
+  }
+}

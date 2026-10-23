@@ -1,0 +1,30 @@
+{
+  "description": "Seed golden tests: all data synthetic. Expand to >=24 manually reviewed company-event pairs.",
+  "schema_version": "0.1.0",
+  "cases": [
+    {
+      "id": "GC001",
+      "company_id": "DEMO-MFG",
+      "event_id": "SYNTH-EVENT-X",
+      "expected_outcome": "POTENTIAL_EXPOSURE",
+      "expected_path_status": "HYPOTHETICAL",
+      "forbidden_claims": ["Финансовые потери подтверждены", "Поставщик установлен по платежу"]
+    },
+    {
+      "id": "GC002",
+      "company_id": "DEMO-SVC",
+      "event_id": "SYNTH-EVENT-X",
+      "expected_outcome": "NO_CONFIRMED_PATH",
+      "expected_path_status": null,
+      "forbidden_claims": ["У компании отсутствуют любые риски"]
+    },
+    {
+      "id": "GC003",
+      "company_id": "DEMO-MFG",
+      "event_id": "SYNTH-EVENT-Q",
+      "expected_outcome": "NO_CONFIRMED_PATH",
+      "expected_path_status": null,
+      "forbidden_claims": ["Событие гарантированно не затронет компанию"]
+    }
+  ]
+}
