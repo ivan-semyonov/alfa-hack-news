@@ -25,9 +25,9 @@ def release():
     files=[p for p in ROOT.rglob('*') if p.is_file() and included(p)]
     manifest={'version':'1.0.0','created_at':datetime.now(timezone.utc).isoformat(),'files':{p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)}}
     try:
-        result=subprocess.run(['git','-c','safe.directory='+str(ROOT.parent),'rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,timeout=5)
+        result=subprocess.run(['git','-c','safe.directory='+ROOT.parent.as_posix(),'rev-parse','HEAD'],cwd=ROOT,capture_output=True,text=True,timeout=5)
         manifest['git_commit']=result.stdout.strip() if result.returncode==0 else None
-        status=subprocess.run(['git','-c','safe.directory='+str(ROOT.parent),'status','--porcelain','--','.'],cwd=ROOT,capture_output=True,text=True,timeout=5)
+        status=subprocess.run(['git','-c','safe.directory='+ROOT.parent.as_posix(),'status','--porcelain','--','.'],cwd=ROOT,capture_output=True,text=True,timeout=5)
         manifest['git_worktree_dirty']=bool(status.stdout.strip()) if status.returncode==0 else None
     except (OSError,subprocess.TimeoutExpired):manifest['git_commit']=None
     with zipfile.ZipFile(target,'w',zipfile.ZIP_DEFLATED) as archive:
