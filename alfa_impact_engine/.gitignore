@@ -10,3 +10,8 @@ node_modules/
 .DS_Store
 /data/raw/
 .runtime/
+/materials/*/
+!/materials/demo/
+/materials/demo/*
+!/materials/demo/README.md
+dist/

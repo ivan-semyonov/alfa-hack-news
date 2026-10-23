@@ -1,123 +1,102 @@
-# Alfa Impact Engine — Участник 1, версия 0.3
+# Alfa Impact Engine 1.0.0
 
-Пакет product/solution/AI: текст → цитируемые утверждения источника → даты/числа/объекты → условный маршрут → инсайт. Компании и граф синтетические. По умолчанию работают локальные правила; добавлен явно включаемый HTTP-адаптер разрешённой LLM с проверкой её цитат. **Реальный провайдер не настроен и не проверен; банковские CSV, Alfa RAG и агент пока не подключены.**
+Локальное приложение для анализа влияния новостей на компанию: профиль → новость → утверждения источника → отраслевой граф → аналитические материалы → условный инсайт → объяснение и вопросы по сохранённому контексту.
 
-Главные документы: [`docs/TECH_SPEC.md`](docs/TECH_SPEC.md) и [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
+Без внешней модели работает режим **«Локальные правила»**. В интерфейсе настраивается OpenAI-совместимый API с моделями из ТЗ. Реальный провайдер и качество его ответов требуют проверки на вашем ключе. Платежи не превращаются в поставщиков, типовые процессы — в факты; финансовый эффект не выдумывается.
 
-Для вашей роли начните с [`docs/PARTICIPANT_1.md`](docs/PARTICIPANT_1.md); команды AI-утилит и формат доверенного контекста — в [`docs/AI_TOOLKIT.md`](docs/AI_TOOLKIT.md).
+## Запуск
 
-Новое в 0.3: [`docs/NEWS_EXTRACTION.md`](docs/NEWS_EXTRACTION.md), настройка адаптера [`docs/LLM_PROVIDER.md`](docs/LLM_PROVIDER.md), регрессия [`docs/EVALUATION.md`](docs/EVALUATION.md). Утверждение источника остаётся непроверенным; `NEEDS_REVIEW` сохраняется в обоих режимах. Инсайт и граф обрабатываются детерминированно даже при извлечении через LLM.
-
-### Windows: запустить подготовленное окружение
+На Windows в подготовленном окружении:
 
 ```powershell
 .\scripts\run.ps1
 ```
 
-Открыть http://127.0.0.1:8000. Если политика PowerShell запрещает запуск скрипта, можно выполнить сервер напрямую:
-
-```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
-```
-
-Создание окружения на другой машине с Python 3.12+:
+Откройте [приложение](http://127.0.0.1:8000/). Для новой машины с Python 3.12+:
 
 ```powershell
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r backend/requirements-dev.txt
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements-lock.txt
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-`backend/requirements-lock.txt` фиксирует весь проверенный Python 3.12/Windows набор, включая транзитивные и тестовые зависимости; для повторения этого окружения используйте его вместо `requirements-dev.txt`.
+Linux/macOS:
 
-### Запустить утилиты
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements-lock.txt
+.venv/bin/python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+```
+
+PDF с текстовым слоем дополнительных программ не требует. Для OCR на Linux нужны Poppler и Tesseract с `rus` и `eng`; в Docker они включены. Windows использует Windows OCR с русским языковым пакетом; Poppler нужен для сложных сканов.
+
+## Первый сценарий
+
+1. **«Открыть демоверсию»**: `demo/demo`, отдельная учебная область, три компании и восемь событий на каждую. Все демокомпании и обзоры синтетические.
+2. Для своих данных: **«Первый запуск? Создать рабочую область»**, пароль от 12 символов, логин `admin`. Первичная настройка доступна локально; для сервера задайте `APP_ADMIN_PASSWORD` до первого старта.
+3. В **«Данные»** импортируйте CSV компаний либо создайте профиль. Затем загружайте платежи/связи. Заголовки определяют схему; ошибка строки отклоняет весь файл; повторный импорт содержимого не дублирует строки. UTF-8 / Windows-1251 выбираются в форме.
+4. В **«Материалы»** загрузите PDF или положите их в показанную папку `materials/workspace/`. Поддерживаются UTF-8 TXT/MD. Синхронизация выполняется перед каждым анализом; старые анализы сохраняют прежний контекст. Дата извлекается с обложки, если распознана. Проверяйте OCR по оригиналу.
+5. В **«Настройки»** введите URL (`https://…/v1`), модель по ТЗ, технический ID модели у провайдера, ключ. Формат `json_schema`/`json_object` выбирается явно. Сохранение не отправляет запрос. Проверка подключения отправляет один короткий запрос, который может стоить денег.
+6. Выберите компанию → **«Анализировать новость»**. Вставьте текст или загрузите конечный HTTPS URL, проверьте текст. LLM делает до двух запросов — извлечение и синтез; при ошибке нет скрытого переключения режима.
+7. Откройте **«Почему это важно»**, **«Источники»**, шаги, задайте вопрос и оцените результат. Вопросы работают по сохранённому контексту, по правилам, без нового вызова модели.
+
+## Реализованные возможности
+
+- Авторизация, отдельный demo tenant, роли ADMIN/READER, cookie-сессии, CSRF и защита от межклиентского доступа.
+- SQLite; адаптер PostgreSQL по DSN. Сохранение компаний, платежей, материалов/страниц, новостей, запусков, шагов, вопросов, оценок, настроек.
+- Три собственных шаблона: производство (ОКВЭД 25–29), ПО/ИТ (62–63), торговля (46–47); восемь объектов, десять тематических каналов.
+- Цитируемые утверждения, даты и числа новости; типизированные условные пути до показателей компании.
+- Страничный лексический поиск аналитики без внешних embeddings: документ, дата, страница, точный фрагмент, метод извлечения.
+- Собственный оркестратор: до 12 шагов, ветвление по каналу, один уточняющий поиск, структурная проверка, журнал времени и ошибок.
+- Ранжированная лента, выводы, граф, источники, вопросы, оценки, экспорт JSON, мониторинг.
+- Переносимое **AES-256-GCM** для ключей API. Общий по ключу суточный счётчик попыток/расходов сохраняется после перезапуска. Без тарифов стоимость неизвестна и действует лимит попыток.
+
+## Конфигурация, перенос и резервная копия
+
+`.env` в корне читается при запуске; переменные процесса имеют приоритет. Пример — [`.env.example`](.env.example). Ключ API предпочтительно задавать через UI.
+
+Мастер-ключ: `APP_SECRET_KEY` (32 случайных байта в URL-safe Base64) либо автоматически созданный `.runtime/vault.key`. Шифрование не привязано к ОС, пользователю или устройству. Для переноса нужны **база, оригиналы PDF и тот же мастер-ключ**. Сохраняйте резервную копию мастер-ключа отдельно от БД. При утрате мастер-ключа введите API-ключ заново. Доступ ко всему каталогу даёт доступ к локальному мастер-ключу: ограничьте права средствами ОС либо используйте менеджер секретов. Детали — [SECURITY.md](docs/SECURITY.md).
 
 ```powershell
-.\.venv\Scripts\python.exe -m scripts.ai_toolkit taxonomy
-.\.venv\Scripts\python.exe -m scripts.ai_toolkit schemas --output-dir contracts
-.\.venv\Scripts\python.exe -m scripts.extract_news schema --output contracts/extraction.schema.json
-.\.venv\Scripts\python.exe -m scripts.extract_news extract --news data/synthetic/news_dated.txt --synthetic --output extraction.json
-.\.venv\Scripts\python.exe -m scripts.news_demo --company DEMO-MFG --input data/synthetic/news_supply.txt --synthetic --output analysis.json
-.\.venv\Scripts\python.exe -m scripts.evaluate_extraction
-.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe scripts/check_vault.py
 ```
 
-JSON-пример: [`data/synthetic/analysis_sample.json`](data/synthetic/analysis_sample.json). Для сравнения компаний повторите `news_demo` с `DEMO-SVC`. HTTP-вход: `POST /api/news/analyze` с полями `company_id`, `text`, опциональными `title`, `source_url`, `is_synthetic`, `extraction_mode` (`RULES` по умолчанию). Отдельный `POST /api/news/extract` возвращает утверждения, даты и величины без графа. `source_url` — только метаданные, загрузки URL нет. Запрос `LLM` без настроенного провайдера возвращает 503; скрытой замены на правила нет.
+Проверка шифрования и повторного открытия без вывода секретов. `.runtime`, `.env`, банковские CSV и локальные PDF исключены из Git и релизного архива.
 
-## Быстрый запуск
-
-### Docker (если установлен)
+## Docker / PostgreSQL
 
 ```bash
 docker compose up --build
 ```
 
-Открыть http://localhost:8000/ для интерактивной демонстрации и http://localhost:8000/docs для OpenAPI.
+Порт привязан к `127.0.0.1:8000`; `.runtime/` и `materials/` постоянны. Для администратора в контейнере задайте `APP_ADMIN_PASSWORD`. На Linux создайте эти каталоги и предоставьте UID 10001 доступ на запись. Нужен **один процесс Uvicorn**: задания исполняются в процессе API, прерванный запуск не повторяется автоматически.
 
-### Локально (Python 3.12+)
+PostgreSQL: задайте `POSTGRES_PASSWORD`, выполните `docker compose --profile storage up -d postgres`, затем задайте `DATABASE_URL=postgresql://alfa:ПАРОЛЬ@postgres:5432/alfa_impact` для API в compose (`127.0.0.1:5432` для локального Python). Схему создаёт `Store`; `db/001_initial.sql` — исторический эскиз, не выполняется.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate     # Windows: .venv\\Scripts\\activate
-pip install -r backend/requirements-dev.txt
-cd backend
-uvicorn app.main:app --reload
+**Docker и живой PostgreSQL на текущем компьютере не проверены: исполняемые среды отсутствуют.** Проверены SQLite и локальный Windows запуск.
+
+## Тесты и утилиты
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m scripts.evaluate_extraction
+.\.venv\Scripts\python.exe -m scripts.evaluate_product
+.\.venv\Scripts\python.exe -m scripts.ai_toolkit taxonomy
+.\.venv\Scripts\python.exe -m scripts.release
 ```
 
-### Тесты
+Оценка продукта: `evaluation/product_report.json`, 24 пары компания×новость, сравнение с/без аналитики, цитаты и ветвление. Это учебная регрессия, а не оценка реальной LLM. Релизный архив исходников создаётся в `dist/` без рабочих данных и секретов.
 
-Из корня проекта:
+Основной API `/api/v1/*`: вход `/api/v1/login`, затем cookie и `X-CSRF-Token` из `/api/v1/me`. Схема `/openapi.json`. Исторические `/api/*` и `/legacy` используют только фиксированную синтетику, не рабочую БД.
 
-```bash
-pytest
-```
+## Документы и границы
 
-### Пример API (структурированное синтетическое событие)
+- [Описание версии 1.0](docs/VERSION_1_0_DESCRIPTION.md)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [Статус / матрица требований](docs/IMPLEMENTATION_STATUS.md)
+- [Безопасность и шифрование](docs/SECURITY.md)
+- [AI-утилиты участника 1](docs/AI_TOOLKIT.md)
+- [Исходное проектное ТЗ](docs/TECH_SPEC.md)
+- [Сторонние компоненты](THIRD_PARTY_NOTICES.md)
 
-```bash
-curl http://localhost:8000/api/demo-events
-curl -X POST http://localhost:8000/api/analyze \
- -H 'Content-Type: application/json' \
- -d '{"company_id":"DEMO-MFG","event":{"id":"SYNTH-EVENT-X","title":"Учебное ограничение поставок компонента X","target_node_ids":["RESOURCE_X"],"channels":["SUPPLY"],"source_ids":["synthetic_news_1"]}}'
-```
-
-Повторить с `company_id: DEMO-SVC` — различная персонализация. Известные `TEMPLATE/INFERENCE` рёбра в первом примере остаются **гипотезами**, а не фактами.
-
-## CSV preflight
-
-Если появятся предоставленные организаторами файлы:
-
-```bash
-python scripts/inspect_csv.py path/to/*.csv
-```
-
-Скрипт определит тип по заголовкам и покажет метаданные, не выводя строки с потенциально чувствительными данными. **Импорт в PostgreSQL — следующий этап.**
-
-Опциональный PostgreSQL (пока API не подключён к БД):
-
-```bash
-docker compose --profile storage up -d postgres
-```
-
-Пароль в compose — только локальный демонстрационный; в реальных окружениях использовать secrets.
-
-## Архитектура этой итерации
-
-```text
-Synthetic company + untrusted news text
-              |
-       /api/news/analyze (RULES_DEMO)
-              |
-    literal matches + candidate Event
-              |
-     NetworkX ExposureGraph
-              |
- typed reverse-dependency traversal
-              |
- candidate ImpactPath + cautious insight + source refs + gaps
-```
-
-Исходный `/api/analyze` для структурированного Event также сохранён. Следующие этапы: банковские данные → полноценное извлечение фактов → Alfa lexical RAG → разрешённая LLM → агентный planner → сохранённый контекст и диалог. Текущий текстовый proof эти этапы не заменяет.
-
-## Compliance
-
-Основной файл кейса не включён в этот архив. Разрешённый перечень LLM и обязательный комплект материалов перечислены в TECH_SPEC. Ни реальные идентификаторы, ни внешние API-ключи в репозиторий не добавлять.
+Функционально завершённый локальный MVP. Внешняя приёмка: реальный API/ключ, предоставленные банковские данные, независимая оценка качества, целевая среда развёртывания. Нет расчёта ущерба и вероятностей, покрытия всех отраслей, автоматического мониторинга новостей, SSO, распределённой очереди и банковских операций. Для публикации в GitHub и доступа жюри нужен ваш репозиторий; автоматической внешней публикации нет.

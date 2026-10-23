@@ -137,6 +137,8 @@ def test_model_configuration_does_not_trigger_calls_and_requested_mode_fails_clo
 
 
 def mock_provider(monkeypatch, content):
+    # These tests isolate extraction transport; workspace tests cover real auth.
+    monkeypatch.setattr('app.main.legacy_llm_guard', lambda request, mode: None)
     for name, value in {'LLM_ENABLED': 'true', 'LLM_BASE_URL': 'https://provider.example/v1',
                         'LLM_API_KEY': 'test-secret-never-return', 'LLM_MODEL': 'GLM-5.3-Flash',
                         'LLM_API_MODEL': 'explicit-provider-id'}.items():

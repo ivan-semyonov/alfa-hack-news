@@ -296,10 +296,13 @@ def _tokens(usage: dict, name: str) -> int | None:
 
 class LLMProvider:
     def __init__(self, config: ProviderConfig, *, transport: httpx.BaseTransport | None = None,
-                 ledger: UsageLedger | None = None):
+                 ledger: UsageLedger | None = None, response_format: str = 'json_schema'):
         self.config = config
         self._transport = transport
         self._ledger = ledger if ledger is not None else _PROCESS_LEDGER
+        if response_format not in ('json_schema', 'json_object'):
+            raise ProviderUnavailable('INVALID_REQUEST')
+        self.response_format = response_format
 
     def status(self) -> dict:
         return self.config.status()
@@ -329,6 +332,8 @@ class LLMProvider:
                        'response_format': {'type': 'json_schema', 'json_schema': {
                            'name': 'structured_output', 'strict': True,
                            'schema': strict_json_schema(schema)}}}
+            if self.response_format == 'json_object':
+                payload['response_format'] = {'type': 'json_object'}
             encoded = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode('utf-8')
         except (TypeError, ValueError, RecursionError):
             raise ProviderUnavailable('INVALID_REQUEST') from None

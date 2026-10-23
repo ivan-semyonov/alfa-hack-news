@@ -9,6 +9,7 @@ from .extraction_models import (
     SourceAssertion, SourceSpan, TargetMention,
 )
 from .news_rules import CHANNEL_PATTERNS, CHANGE_PATTERN, TARGET_PATTERN
+from .industry import TARGET_ALIASES, TARGET_INDEX, TARGET_PATTERNS
 from .product_models import NewsInput, SourceDocument
 
 
@@ -25,10 +26,10 @@ QUANTITY_PATTERN = re.compile(r'(?<![\w.])(?P<value>' + NUMBER + r')(?:\s*(?P<un
 ACTION_PATTERN = re.compile(
     r'\b(?:огранич\w*|задерж\w*|дефицит\w*|запрет\w*|перебо\w*|останов\w*|'
     r'нехват\w*|подорож\w*|возобнов\w*|сокращ\w*|повыс\w*|сниз\w*|увелич\w*|'
-    r'отмен\w*|снят\w*)', re.I,
+    r'отмен\w*|снят\w*|вырос\w*|упал\w*|замедл\w*|ускор\w*|прекрат\w*|недоступ\w*)', re.I,
 )
 ACTOR_PATTERN = re.compile(r'\b(?:центральный\s+банк|банк|правительство|регулятор|компания|завод)\b', re.I)
-OBJECT_PATTERN = re.compile(TARGET_PATTERN.pattern + r'|\bключев\w*\s+ставк\w*', re.I)
+OBJECT_PATTERN = re.compile('|'.join(item['pattern'] for item in TARGET_ALIASES), re.I)
 NEGATION_PATTERN = re.compile(r'\b(?:не|нет|отмен\w*|снят\w*|опроверг\w*|отсутств\w*)\b', re.I)
 POSSIBILITY_PATTERN = re.compile(r'\b(?:если|возможно|может|могут|вероятно|предполож\w*|ожида\w*|прогноз\w*|планир\w*|неизвест\w*)\b', re.I)
 
@@ -105,11 +106,12 @@ def rule_draft(source: SourceDocument) -> ExtractionDraft:
         assertion = SourceAssertion(id=f'assertion:{index + 1}', text=make_span(source, start, end),
                                     modality=classify_modality(text), **fields)
         assertions.append(assertion)
-        for match in TARGET_PATTERN.finditer(text):
-            if len(targets) == 20:
-                break
-            targets.append(TargetMention(node_id='RESOURCE_X', assertion_id=assertion.id,
-                                          span=make_span(source, start + match.start(), start + match.end())))
+        for target, pattern in TARGET_PATTERNS:
+            for match in pattern.finditer(text):
+                if len(targets) == 20:
+                    break
+                targets.append(TargetMention(node_id=target['id'], assertion_id=assertion.id,
+                                              span=make_span(source, start + match.start(), start + match.end())))
     oversized_match = False
     date_matches = list(DATE_PATTERN.finditer(source.text))
     dates = []
@@ -203,7 +205,8 @@ def validate_draft(payload: dict, source: SourceDocument) -> ExtractionDraft:
     for item in draft.target_mentions:
         check(item.span)
         assertion = assertions.get(item.assertion_id)
-        if item.node_id != 'RESOURCE_X' or not TARGET_PATTERN.fullmatch(item.span.quote):
+        target = TARGET_INDEX.get(item.node_id)
+        if not target or not re.fullmatch(target['pattern'], item.span.quote, re.I):
             raise ExtractionValidationError('UNKNOWN_TARGET_ALIAS')
         if not assertion or not _inside(item.span, assertion.text):
             raise ExtractionValidationError('TARGET_OUTSIDE_ASSERTION')
@@ -247,7 +250,7 @@ def eligible_targets(extraction: ExtractionResult, source: SourceDocument | None
             continue
         def in_original(span):
             return original_bounds[0] <= span.start and span.end <= original_bounds[1]
-        supply_in_assertion = any(item.channel == 'SUPPLY' and _inside(item.span, assertion.text)
+        supply_in_assertion = any(item.channel in TARGET_INDEX[target.node_id]['channels'] and _inside(item.span, assertion.text)
                                   and in_original(item.span)
                                   for item in extraction.channel_evidence)
         if (assertion.modality == 'ASSERTED' and classify_modality(assertion.text.quote) == 'ASSERTED'
@@ -273,11 +276,12 @@ def build_extraction_prompt(source: SourceDocument) -> list[dict]:
         'Число, единица и период — отдельные точные цитаты, без пересчёта или выдуманных значений. '
         'Для неизвестных полей используй null и knowledge_gaps. '
         'Каждый канал, кроме OTHER, имеет channel_evidence из текста; OTHER используется отдельно. '
-        'Разрешён единственный alias графа: компонент X/Х -> RESOURCE_X; остальные объекты '
+        'Разрешены только alias из реестра графа; остальные объекты '
         'можно цитировать в assertions, но нельзя выдавать им вымышленные ID графа. '
         'Идентификаторы assertion уникальны. Верни только объект JSON без Markdown. '
     )
-    registry = {'source_id': source.id, 'output_schema': strict_json_schema(ExtractionDraft.model_json_schema())}
+    registry = {'source_id': source.id, 'target_aliases': TARGET_ALIASES,
+                'output_schema': strict_json_schema(ExtractionDraft.model_json_schema())}
     return [{'role': 'system', 'content': policy + json.dumps(registry, ensure_ascii=False)},
             {'role': 'user', 'content': json.dumps({'untrusted_news': {'title': source.title, 'text': source.text,
                                                                       'is_synthetic': source.is_synthetic}}, ensure_ascii=False)}]

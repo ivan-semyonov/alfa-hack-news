@@ -1,6 +1,8 @@
-"""Alpha skeleton: deterministic synthetic demonstration, not finished hackathon app."""
+"""Alfa Impact Engine workspace plus backwards compatible synthetic proof API."""
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+import os
+from fastapi import FastAPI, HTTPException, Request
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -13,12 +15,40 @@ from .extraction_models import ExtractionResult
 from .llm_provider import ProviderConfig, ProviderConfigurationError, ProviderUnavailable
 from .product_models import NewsExtractionRequest, NewsAnalysisRequest, NewsAnalysisResponse, NormalizationResult
 from .taxonomy import taxonomy_document
+from .product_api import router as product_router
+from .product_api import principal, admin
+from .app_config import get_service
 
-app = FastAPI(title='Alfa Impact Engine — grounded extraction proof', version='0.3.0',
-              description='Synthetic graph; grounded source assertions via rules or an explicitly configured LLM adapter. No bank CSV or Alfa RAG.')
+app = FastAPI(title='Alfa Impact Engine', version='1.0.0',
+              description='Authenticated research workspace. Legacy /api routes contain fixed synthetic fixtures only.')
+app.include_router(product_router)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=os.getenv('APP_ALLOWED_HOSTS', '127.0.0.1,localhost,[::1],testserver').split(','))
 GRAPH = ExposureGraph(NODES, EDGES)
 COMPANY_INDEX = {company.id: company for company in COMPANIES}
 STATIC_INDEX = Path(__file__).resolve().parents[2] / 'frontend' / 'index.html'
+
+
+@app.middleware('http')
+async def boundaries(request, call_next):
+    if request.method in ('POST', 'PUT', 'PATCH'):
+        length = request.headers.get('content-length', '0')
+        if not length.isdecimal() or int(length) > 16_000_000:
+            return JSONResponse(status_code=413, content={'detail': 'Запрос превышает 16 МБ.'})
+        # Read at most the bound even when Content-Length is absent or incorrect.
+        body = bytearray()
+        async for chunk in request.stream():
+            body.extend(chunk)
+            if len(body) > 16_000_000:
+                return JSONResponse(status_code=413, content={'detail': 'Запрос превышает 16 МБ.'})
+        request._body = bytes(body)
+    response = await call_next(request)
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['Referrer-Policy'] = 'same-origin'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    if request.url.path.startswith('/api/v1'):
+        response.headers['Cache-Control'] = 'no-store'
+    return response
 
 
 @app.exception_handler(RequestValidationError)
@@ -32,7 +62,19 @@ async def validation_error(request, exc):
 
 @app.get('/', include_in_schema=False)
 def index():
-    return FileResponse(STATIC_INDEX) if STATIC_INDEX.is_file() else {'docs': '/docs'}
+    return FileResponse(STATIC_INDEX.with_name('product.html'))
+
+
+@app.get('/assets/{name}', include_in_schema=False)
+def asset(name: str):
+    if name not in ('product.js', 'product.css', 'legacy.js'):
+        raise HTTPException(404)
+    return FileResponse(STATIC_INDEX.with_name(name))
+
+
+@app.get('/legacy', include_in_schema=False)
+def legacy():
+    return FileResponse(STATIC_INDEX)
 
 
 @app.get('/api/health')
@@ -56,6 +98,15 @@ def extraction_operation(operation):
     except ExtractionValidationError:
         raise HTTPException(status_code=503, detail='Ответ модели не прошёл проверку структуры и цитат '
                             '(INVALID_MODEL_EXTRACTION). Выберите локальные правила или повторите позже.') from None
+
+
+def legacy_llm_guard(request, mode):
+    if mode != 'LLM':
+        return
+    if not ProviderConfig.from_env().enabled:
+        raise HTTPException(503, 'LLM DISABLED. Настройте модель в защищённой рабочей области.')
+    user = principal(request, get_service(request))
+    admin(user)
 
 
 @app.get('/api/taxonomy')
@@ -88,17 +139,20 @@ def demo_events():
 
 
 @app.post('/api/news/normalize', response_model=NormalizationResult)
-def normalize_text(news: NewsExtractionRequest):
+def normalize_text(news: NewsExtractionRequest, request: Request):
+    legacy_llm_guard(request, news.extraction_mode)
     return extraction_operation(lambda: normalize_news(news, extraction_mode=news.extraction_mode))
 
 
 @app.post('/api/news/extract', response_model=ExtractionResult)
-def extract_text(news: NewsExtractionRequest):
+def extract_text(news: NewsExtractionRequest, request: Request):
+    legacy_llm_guard(request, news.extraction_mode)
     return extraction_operation(lambda: extract_news(news, mode=news.extraction_mode)[1])
 
 
 @app.post('/api/news/analyze', response_model=NewsAnalysisResponse)
-def analyze_text(req: NewsAnalysisRequest):
+def analyze_text(req: NewsAnalysisRequest, request: Request):
+    legacy_llm_guard(request, req.extraction_mode)
     company = COMPANY_INDEX.get(req.company_id)
     if company is None:
         raise HTTPException(status_code=404, detail='Company not found')

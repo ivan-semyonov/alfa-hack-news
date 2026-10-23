@@ -1,0 +1,12 @@
+.git
+.venv
+.runtime
+.env
+.env.*
+materials
+data/raw
+__pycache__
+**/__pycache__
+.pytest_cache
+dist
+.idea

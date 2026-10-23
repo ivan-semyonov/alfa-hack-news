@@ -2,20 +2,32 @@ services:
   api:
     build: .
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
+    environment:
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-}
+      APP_DEMO_ENABLED: ${APP_DEMO_ENABLED:-true}
+      APP_ALLOWED_HOSTS: ${APP_ALLOWED_HOSTS:-127.0.0.1,localhost,[::1]}
+      DATABASE_URL: ${DATABASE_URL:-/opt/alfa/.runtime/impact.sqlite}
+    volumes:
+      - ./.runtime:/opt/alfa/.runtime
+      - ./materials:/opt/alfa/materials
     restart: unless-stopped
-  # Optional database for the subsequent integration milestone.
   postgres:
     image: postgres:16-alpine
     profiles: ["storage"]
     environment:
       POSTGRES_DB: alfa_impact
       POSTGRES_USER: alfa
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_demo_only_not_for_production}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./db/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
     ports:
       - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alfa -d alfa_impact"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
   pgdata:

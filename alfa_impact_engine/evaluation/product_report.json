@@ -1,0 +1,235 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "OFFLINE_RULE_REGRESSION",
+  "external_llm_tested": false,
+  "passed": true,
+  "cases_passed": 24,
+  "cases_total": 24,
+  "cases": [
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 0,
+      "title": "Ограничение поставок компонента X",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 1,
+      "title": "Изменились условия финансирования",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 2,
+      "title": "Потребительский спрос ускорился",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 3,
+      "title": "Перебои в электроснабжении",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 4,
+      "title": "Изменения на рынке труда",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 5,
+      "title": "Доступность программных сервисов",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 6,
+      "title": "Ограничение поставок отменено",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-MFG",
+      "news_index": 7,
+      "title": "Новая музейная выставка",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 0,
+      "title": "Ограничение поставок компонента X",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 1,
+      "title": "Изменились условия финансирования",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 2,
+      "title": "Потребительский спрос ускорился",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 3,
+      "title": "Перебои в электроснабжении",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 4,
+      "title": "Изменения на рынке труда",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 5,
+      "title": "Доступность программных сервисов",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 6,
+      "title": "Ограничение поставок отменено",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-SVC",
+      "news_index": 7,
+      "title": "Новая музейная выставка",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 0,
+      "title": "Ограничение поставок компонента X",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 1,
+      "title": "Изменились условия финансирования",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 2,
+      "title": "Потребительский спрос ускорился",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 3,
+      "title": "Перебои в электроснабжении",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 4,
+      "title": "Изменения на рынке труда",
+      "expected_path": true,
+      "actual_path": true,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 5,
+      "title": "Доступность программных сервисов",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 10,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 6,
+      "title": "Ограничение поставок отменено",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    },
+    {
+      "company_id": "DEMO-TRADE",
+      "news_index": 7,
+      "title": "Новая музейная выставка",
+      "expected_path": false,
+      "actual_path": false,
+      "steps": 9,
+      "passed": true
+    }
+  ],
+  "rag_ablation": {
+    "fixture_is_controlled_test_not_bank_publication": true,
+    "without_status": "NOT_FOUND",
+    "with_status": "REFINES",
+    "risk_changed": true,
+    "actions_changed": true,
+    "literal_citations_valid": true
+  },
+  "warning": "Synthetic regression, not production accuracy, causal validity or real LLM quality."
+}

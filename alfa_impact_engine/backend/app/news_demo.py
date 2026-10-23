@@ -7,6 +7,7 @@ from .product_models import (
     NormalizationResult, ProductInsight, SourceDocument, SuggestedAction, TargetMatch,
 )
 from .news_extraction import eligible_targets, extract_news
+from .industry import TARGET_INDEX
 
 
 def normalize_news(news: NewsInput, *, extraction_mode='RULES', provider=None) -> NormalizationResult:
@@ -19,12 +20,12 @@ def normalize_news(news: NewsInput, *, extraction_mode='RULES', provider=None) -
     fingerprint = source.id.removeprefix('news:')
     matches = [ChannelMatch(channel=m.channel, quote=m.span.quote, start=m.span.start, end=m.span.end)
                for m in extraction.channel_evidence]
-    targets = [TargetMatch(node_id=m.node_id, label='Условный компонент X', quote=m.span.quote,
+    targets = [TargetMatch(node_id=m.node_id, label=TARGET_INDEX[m.node_id]['label'], quote=m.span.quote,
                            start=m.span.start, end=m.span.end) for m in extraction.target_mentions]
     target_ids = eligible_targets(extraction, source)
     warnings = extraction.warnings + [
         'Полнота, достоверность, актуальность и направление эффекта требуют ручной проверки.',
-        'Сопоставление с графом ограничено учебным компонентом X; прочие объекты не исследованы.',
+        'Сопоставление ограничено реестром объектов и доступными отраслевыми шаблонами.',
     ]
     if not target_ids:
         warnings.append('Оснований для запуска учебного маршрута недостаточно; нужен разбор новости.')
